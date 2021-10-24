@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 import java.sql.SQLException;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.springframework.context.ApplicationContext;
@@ -15,18 +16,39 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import springbook.user.domain.User;
 
+/***
+ * 
+ * [JUnit이 하나의 테스트 클래스를 가져와 테스트를 수행하는 방식]
+ * 1. 테스트 클래스에서 @Test가 붙은 public && void && 파라미터 없는 테스트 메소드를 모두 찾는다.
+ * 2. 테스트 클래스의 오브젝트를 하나 만든다.
+ * 3. @Before가 붙은 메소드가 있으면 실행한다.
+ * 4. @Test가 붙은 메소드를 하나 호출하고 테스트 결과를 저장해둔다.
+ * 5. @After가 붙은 메소드가 있으면 실행한다.
+ * 6. 나머지 테스트 메소드에 대해 2~5 과정을 반복한다.
+ * 7. 모든 테스트의 결과를 종합해서 돌려준다. 
+ * 
+ */
 public class UserDAOTest {
+	// 픽스처 : 테스트를 수행하는 데 필요한 정보나 오브젝트
+	// 반복적으로 사용되기 때문에 @Before 메소드를 이용해 생성해둔다.
+	private UserDAO dao;
+	private User user1;
+	private User user2;
+	private User user3;
+	
+	@Before
+	public void setUp() {
+		ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
+		
+		this.dao = context.getBean("userDAO", UserDAO.class);
+		this.user1 = new User("chaeeun1", "윤채은1", "dbscodms1");
+		this.user2 = new User("chaeeun2", "윤채은2", "dbscodms2");
+		this.user3 = new User("chaeeun3", "윤채은3", "dbscodms3");
+	}
 	
 	// JUnit에게 테스트 메소드임을 알림
 	@Test
 	public void addAndGet() throws SQLException{	// JUnit 메소드는 반드시 public으로 선언
-		ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-		
-		UserDAO dao = context.getBean("userDAO", UserDAO.class);
-		
-		User user1 = new User("chaeeun1", "윤채은1", "dbscodms1");
-		User user2 = new User("chaeeun2", "윤채은2", "dbscodms2");
-		
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
@@ -45,14 +67,6 @@ public class UserDAOTest {
 	
 	@Test
 	public void count() throws SQLException {
-		ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-		
-		UserDAO dao = context.getBean("userDAO", UserDAO.class);
-		
-		User user1 = new User("chaeeun1", "윤채은1", "dbscodms1");
-		User user2 = new User("chaeeun2", "윤채은2", "dbscodms2");
-		User user3 = new User("chaeeun3", "윤채은3", "dbscodms3");
-		
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
@@ -68,10 +82,6 @@ public class UserDAOTest {
 	
 	@Test(expected=EmptyResultDataAccessException.class)
 	public void getUserFailure() throws SQLException{
-		ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-		
-		UserDAO dao = context.getBean("userDAO", UserDAO.class);
-		
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
