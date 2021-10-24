@@ -12,7 +12,15 @@ public class UserDAO {
 
 	private ConnectionMaker connectionMaker;
 	
+	public UserDAO() {
+	}
+	
 	public UserDAO(ConnectionMaker connectionMaker) {
+		this.connectionMaker = connectionMaker;
+	}
+	
+	// 수정자 메소드(setter) DI 추가
+	public void setConnectionMaker(ConnectionMaker connectionMaker) {
 		this.connectionMaker = connectionMaker;
 	}
 	
