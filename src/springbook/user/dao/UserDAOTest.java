@@ -9,8 +9,9 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 public class UserDAOTest {
 	
 	public static void main(String[] args) throws ClassNotFoundException, SQLException{
-		// XML 설정파일을 사용하도록 수정
+		// 자바 코드 사용
 		//ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+		// XML 설정파일 사용
 		ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
 		
 		// @Bean 이 붙은 메소드 이름이 빈의 이름이 된다.

@@ -6,26 +6,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
 import springbook.user.domain.User;
 
 public class UserDAO {
 
-	private ConnectionMaker connectionMaker;
+	// DataSource 인터페이스 사용
+	private DataSource dataSource;
 	
 	public UserDAO() {
 	}
 	
-	public UserDAO(ConnectionMaker connectionMaker) {
-		this.connectionMaker = connectionMaker;
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 	
-	// 수정자 메소드(setter) DI 추가
-	public void setConnectionMaker(ConnectionMaker connectionMaker) {
-		this.connectionMaker = connectionMaker;
-	}
-	
-	public void add(User user) throws ClassNotFoundException, SQLException {
-		Connection c = connectionMaker.makeConnection();
+	public void add(User user) throws SQLException {
+		Connection c = dataSource.getConnection();
 		
 		PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
 		ps.setString(1, user.getId());
@@ -38,8 +36,8 @@ public class UserDAO {
 		c.close();
 	}
 	
-	public User get(String id) throws ClassNotFoundException, SQLException {
-		Connection c = connectionMaker.makeConnection();
+	public User get(String id) throws SQLException {
+		Connection c = dataSource.getConnection();
 		
 		PreparedStatement ps = c.prepareStatement("select * from users where id=?");
 		ps.setString(1, id);
