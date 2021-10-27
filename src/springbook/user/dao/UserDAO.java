@@ -9,7 +9,10 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.mysql.jdbc.MysqlErrorNumbers;
+
 import springbook.user.domain.User;
+import springbook.user.exception.DuplicateUserIdException;
 
 public class UserDAO {
 
@@ -36,9 +39,19 @@ public class UserDAO {
 	}
 
 
-	public void add(User user) throws SQLException {
-		this.jdbcTemplate.update("insert into users(id, name, password) values(?,?,?)"
-										, user.getId(), user.getName(), user.getPassword());
+	public void add(User user) throws DuplicateUserIdException {
+		try {
+			this.jdbcTemplate.update("insert into users(id, name, password) values(?,?,?)"
+					, user.getId(), user.getName(), user.getPassword());
+			// 컴파일 에러를 피하기 위해 넣음
+			throw new SQLException();
+		}catch(SQLException e) {
+			if(e.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
+				throw new DuplicateUserIdException(e);	// 예외 전환
+			}else {
+				throw new RuntimeException(e);			// 예외 포장
+			}
+		}
 	}
 	
 	public User get(String id) throws SQLException {
