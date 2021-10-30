@@ -18,5 +18,9 @@
 		<!-- <property name="connectionMaker" ref="connectionMaker"/> -->
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
+	
+	<bean id="userService" class="springbook.user.service.UserService">
+		<property name="userDAO" ref="userDAO"/>
+	</bean>
 
 </beans>
