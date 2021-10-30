@@ -162,6 +162,27 @@ public class UserDAOTest {
 		}
 	}
 	
+	@Test
+	public void update() {
+		dao.deleteAll();
+		
+		dao.add(user1);
+		dao.add(user2);
+		
+		user1.setName("±è±è±è");
+		user1.setPassword("1234");
+		user1.setLevel(Level.GOLD);
+		user1.setLogin(1000);
+		user1.setRecommend(9999);
+		
+		dao.update(user1);
+		
+		User user1update = dao.get(user1.getId());
+		checkSameUser(user1, user1update);
+		User user2same = dao.get(user2.getId());
+		checkSameUser(user2, user2same);
+	}
+	
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException{
 		/*
