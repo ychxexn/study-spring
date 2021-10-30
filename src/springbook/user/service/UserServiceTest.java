@@ -58,6 +58,24 @@ public class UserServiceTest {
 		checkLevel(users.get(4), Level.GOLD);
 	}
 	
+	@Test
+	public void add() {
+		userDAO.deleteAll();
+		
+		User userWithLevel = users.get(4);
+		User userWithoutLevel = users.get(0);
+		userWithoutLevel.setLevel(null);
+		
+		userService.add(userWithLevel);
+		userService.add(userWithoutLevel);
+		
+		User userWithLevelRead = userDAO.get(userWithLevel.getId());
+		User userWithoutLevelRead = userDAO.get(userWithoutLevel.getId());
+		
+		assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
+		assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
+	}
+	
 	private void checkLevel(User user, Level expectedLevel) {
 		User userUpdate = userDAO.get(user.getId());
 		assertThat(userUpdate.getLevel(), is(expectedLevel));
