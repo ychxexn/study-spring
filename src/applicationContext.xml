@@ -21,6 +21,7 @@
 	
 	<bean id="userService" class="springbook.user.service.UserService">
 		<property name="userDAO" ref="userDAO"/>
+		<property name="dataSource" ref="dataSource"/>
 	</bean>
 
 </beans>
