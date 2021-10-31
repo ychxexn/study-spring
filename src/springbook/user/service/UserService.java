@@ -10,6 +10,9 @@ import springbook.user.domain.User;
 public class UserService {
 	UserDAO userDAO;
 	
+	public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
+	public static final int MIN_RECCOMEND_FOR_GOLD = 30;
+	
 	public void setUserDAO(UserDAO userDAO) {
 		this.userDAO = userDAO;
 	}
@@ -29,9 +32,9 @@ public class UserService {
 		
 		switch(currentLevel) {
 			case BASIC:
-				return (user.getLogin() >= 50);
+				return (user.getLogin() >= MIN_LOGCOUNT_FOR_SILVER);
 			case SILVER:
-				return (user.getRecommend() >= 30);
+				return (user.getRecommend() >= MIN_RECCOMEND_FOR_GOLD);
 			case GOLD:
 				return false;
 			default:
