@@ -68,27 +68,31 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext	// 컨텍스트의 DI 설정을 변경하는 테스트임을 뜻함
 	public void upgradeLevels() throws Exception {
-		userDAO.deleteAll();
+		UserServiceImpl userServiceImpl = new UserServiceImpl();
 		
-		for(User user : users) {
-			userDAO.add(user);
-		}
+		MockUserDAO mockUserDAO = new MockUserDAO(this.users);
+		userServiceImpl.setUserDAO(mockUserDAO);
 		
 		MockMailSender mockMailSender = new MockMailSender();
 		userServiceImpl.setMailSender(mockMailSender);
 		
 		userService.upgradeLevels();
 		
-		checkLevelUpgraded(users.get(0), false);
-		checkLevelUpgraded(users.get(1), true);
-		checkLevelUpgraded(users.get(2), false);
-		checkLevelUpgraded(users.get(3), true);
-		checkLevelUpgraded(users.get(4), false);
+		List<User> updated = mockUserDAO.getUpdated();
+		
+		assertThat(updated.size(), is(2));
+		checkUserAndLevel(updated.get(0), "chaeeun2", Level.SILVER);
+		checkUserAndLevel(updated.get(1), "chaeeun4", Level.GOLD);
 		
 		List<String> request = mockMailSender.getRequests();
 		assertThat(request.size(), is(2));
 		assertThat(request.get(0), is(users.get(1).getEmail()));
 		assertThat(request.get(1), is(users.get(3).getEmail()));
+	}
+	
+	private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
+		assertThat(updated.getId(), is(expectedId));
+		assertThat(updated.getLevel(), is(expectedLevel));
 	}
 	
 	@Test
@@ -159,5 +163,38 @@ public class UserServiceTest {
 		public void send(SimpleMailMessage[] mailMessage) throws MailException {
 		}
 		
+	}
+	
+	static class MockUserDAO implements UserDAO {
+
+		private List<User> users;
+		private List<User> updated = new ArrayList<User>();
+		
+		private MockUserDAO(List<User> users) {
+			this.users = users;
+		}
+		
+		public List<User> getUpdated(){
+			return this.updated;
+		}
+		
+		@Override
+		public List<User> getAll() {
+			return this.users;
+		}
+		
+		@Override
+		public void update(User user) {
+			updated.add(user);
+		}
+		
+		@Override
+		public void add(User user) { throw new UnsupportedOperationException(); }
+		@Override
+		public User get(String id) { throw new UnsupportedOperationException(); }
+		@Override
+		public void deleteAll() { throw new UnsupportedOperationException(); }
+		@Override
+		public int getCount() { throw new UnsupportedOperationException(); }
 	}
 }
