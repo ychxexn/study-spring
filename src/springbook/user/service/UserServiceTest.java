@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import static springbook.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
 import static springbook.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import springbook.user.dao.UserDAO;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
+import springbook.user.proxy.TransactionHandler;
 import springbook.user.service.TestUserService.TestUserServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -161,9 +163,13 @@ public class UserServiceTest {
 		testUserService.setUserDAO(this.userDAO);
 		testUserService.setMailSender(mailSender);
 		
-		UserServiceTx txUserService = new UserServiceTx();
-		txUserService.setTransactionManager(transactionManager);
-		txUserService.setUserService(testUserService);
+		TransactionHandler txHandler = new TransactionHandler();
+		txHandler.setTarget(testUserService);
+		txHandler.setTransactionManager(transactionManager);
+		txHandler.setPattern("upgradeLevels");
+		
+		UserService txUserService = (UserService)Proxy.newProxyInstance(
+				getClass().getClassLoader(), new Class[] {UserService.class}, txHandler);
 		
 		userDAO.deleteAll();
 		
